@@ -31,6 +31,4 @@ Technical Metrics
 
 I measure success using Precision Recall and the F1 Score. I used a Chi squared test of independence to verify the statistical significance of my results. The findings suggest that data augmentation improves minority cohort performance by 15 percent.
 
-Reference
 
-This work is part of a senior capstone project on medical AI safety and linguistic equity.
