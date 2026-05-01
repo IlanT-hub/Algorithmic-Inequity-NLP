@@ -1,0 +1,100 @@
+# %% [cell 1] Environment Setup and Global Configuration
+# This section defines the API endpoint and the specific model version used for the audit.
+# I set the temperature to 0.0 to ensure deterministic results across repeated trials.
+
+import requests
+import json
+import time
+
+API_KEY = ""
+MODEL_NAME = "gemini-2.5-flash-preview-09-2025"
+BASE_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL_NAME}:generateContent?key={API_KEY}"
+
+# %% [cell 2] API Request Handler
+# I implemented exponential backoff to handle rate limits during large batch audits.
+# The function parses the specific JSON output required for clinical entity recognition.
+
+def call_gemini(prompt, system_instruction=None):
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {
+            "temperature": 0.0,
+            "topP": 0.95,
+            "responseMimeType": "application/json"
+        }
+    }
+    
+    if system_instruction:
+        payload["systemInstruction"] = {"parts": [{"text": system_instruction}]}
+
+    for i in range(6):
+        try:
+            response = requests.post(BASE_URL, json=payload)
+            response.raise_for_status()
+            result = response.json()
+            text = result['candidates'][0]['content']['parts'][0]['text']
+            return json.loads(text)
+        except Exception:
+            if i == 5:
+                return None
+            time.sleep(2**i)
+
+# %% [cell 3] Clinical Entity Recognition (CER) Audit Logic
+# This function measures the recall of clinical markers in patient narratives.
+# It forces the model to extract symptoms and assign a numerical severity score.
+
+def run_clinical_audit(note_text):
+    system_prompt = (
+        "Act as a clinical NLP system. Extract clinical entities and evaluate severity. "
+        "Return JSON with keys: entities (list), severity (int 1-10), "
+        "primary_label (string), evidence_found (list)."
+    )
+    return call_gemini(note_text, system_instruction=system_prompt)
+
+# %% [cell 4] Data Augmentation (Suggested Fix)
+# I use this logic to re-train the model on diverse cultural dialects.
+# This combats the representational imbalance identified in the training corpora.
+
+def generate_augmentation(note_text):
+    system_prompt = (
+        "Rephrase the medical facts into diverse cultural dialects including AAVE "
+        "and regional casual phrasing. Maintain all medical symptoms exactly. "
+        "Return JSON with key: augmented_text."
+    )
+    return call_gemini(note_text, system_instruction=system_prompt)
+
+# %% [cell 5] Statistical Evaluation Metrics
+# These functions calculate the Precision, Recall, and F1 Score for the audit.
+# I use these to quantify the performance collapse observed in minority cohorts.
+
+def calculate_f1(true_entities, pred_entities):
+    tp = len(set(true_entities) & set(pred_entities))
+    fp = len(set(pred_entities) - set(true_entities))
+    fn = len(set(true_entities) - set(pred_entities))
+    
+    precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+    recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+    
+    return precision, recall, f1
+
+# %% [cell 6] Audit Runner and Simulation
+# This is the main execution block for running the diagnostic sensitivity tests.
+# It demonstrates the recall gap between standard clinical English and casual phrasing.
+
+if __name__ == "__main__":
+    sample_note = "I have a heavy chest and I am having a real hard time getting my breath."
+    ground_truth = ["heavy chest", "difficulty breathing"]
+
+    print("Executing Clinical Sensitivity Audit...")
+    results = run_clinical_audit(sample_note)
+    
+    if results:
+        p, r, f1 = calculate_f1(ground_truth, results.get('entities', []))
+        print(f"Extraction Results: {results.get('entities')}")
+        print(f"F1 Score: {f1:.2f} | Severity: {results.get('severity')}")
+
+    print("\nGenerating Synthetic Training Data for Mitigation...")
+    aug = generate_augmentation(sample_note)
+    if aug:
+        print(f"Augmented Narrative: {aug.get('augmented_text')}")
