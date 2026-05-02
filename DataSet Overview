@@ -1,0 +1,10 @@
+This directory contains documentation and sample data for the Algorithmic Inequity Audit. You will find the information required to understand the clinical narratives used in the research.
+
+MIMIC-III Data Usage
+The research utilizes the MIMIC-III v1.4 database. This is a restricted clinical dataset. You must obtain credentialed access from PhysioNet to view the raw patient records. I do not include protected health information in this repository.
+
+Sample Reports
+I provide a CSV file with synthetic clinical narratives. These reports mirror the structure of the NOTEEVENTS table in the original database. They are designed to test the diagnostic sensitivity of NLP models. Each row contains a specific medical case presented in two different linguistic styles.
+
+File Structure
+The sample_reports.csv file includes columns for the case identifier and the phrasing category. It also lists the ground truth symptoms. This allows the audit script to calculate recall and precision metrics automatically.
