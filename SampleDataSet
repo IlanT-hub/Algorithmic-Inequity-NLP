@@ -1,0 +1,11 @@
+case_id,category,phrasing_style,report_text,ground_truth_symptoms
+RES-001,Respiratory,Standard,"Patient presents with acute dyspnea and substernal chest pressure.","dyspnea, chest pressure"
+RES-001,Respiratory,Casual,"I have a heavy chest and I am having a real hard time getting my breath.","dyspnea, chest pressure"
+RES-002,Respiratory,Standard,"Subject reports persistent coughing and wheezing with tachypnea.","coughing, wheezing, tachypnea"
+RES-002,Respiratory,Casual,"I am coughing a lot and I am wheezing whenever I try to move around.","coughing, wheezing, tachypnea"
+RES-003,Respiratory,Standard,"Patient exhibits audible stridor and significant work of breathing.","stridor, work of breathing"
+RES-003,Respiratory,Casual,"My throat is making a loud noise and I am struggling to get air in.","stridor, work of breathing"
+RES-004,Respiratory,Standard,"Patient describes pleuritic chest pain and a productive cough.","pleuritic chest pain, productive cough"
+RES-004,Respiratory,Casual,"It hurts deep in my ribs when I breathe and I am coughing up junk.","pleuritic chest pain, productive cough"
+RES-005,Respiratory,Standard,"Examination reveals bilateral rales and decreased oxygen saturation.","rales, decreased oxygen saturation"
+RES-005,Respiratory,Casual,"I feel a crackling in my lungs and I feel lightheaded like I need more air.","rales, decreased oxygen saturation"
